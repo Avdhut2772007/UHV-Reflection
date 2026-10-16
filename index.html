@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UHV Interactive Reflection & Harmony Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emeraldBrand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth tab transitions */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- Header & Live Harmony Score Tracker -->
+    <header class="bg-emeraldBrand-800 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white text-emeraldBrand-800 font-extrabold px-3 py-1.5 rounded-xl text-lg shadow">UHV</div>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg leading-tight">UHV Seva Reflection Hub</h1>
+                    <p class="text-xs text-emeraldBrand-100">PCCoE Department of Applied Sciences & Humanities</p>
+                </div>
+            </div>
+
+            <!-- Global Harmony Score Widget -->
+            <div class="flex items-center space-x-3 bg-emeraldBrand-900/80 px-4 py-1.5 rounded-full border border-emeraldBrand-500/30">
+                <span class="text-xs uppercase tracking-wider font-semibold text-emeraldBrand-100">Harmony Score:</span>
+                <span id="harmony-score" class="font-extrabold text-xl text-amber-300">0</span>
+                <span class="text-sm">🌟</span>
+            </div>
+        </div>
+
+        <!-- Navigation Bar -->
+        <nav class="bg-emeraldBrand-900 border-t border-emeraldBrand-700/60 text-xs sm:text-sm font-medium">
+            <div class="max-w-5xl mx-auto px-2 flex justify-start sm:justify-center space-x-2 sm:space-x-6 overflow-x-auto py-2 scrollbar-none">
+                <button id="nav-quiz" onclick="switchTab('quiz')" class="px-3.5 py-1.5 rounded-lg hover:bg-emeraldBrand-700 text-emeraldBrand-100 transition whitespace-nowrap">📝 Dynamic Quiz</button>
+                <button id="nav-game" onclick="switchTab('game')" class="px-3.5 py-1.5 rounded-lg hover:bg-emeraldBrand-700 text-emeraldBrand-100 transition whitespace-nowrap">🎮 Gamified Scenarios</button>
+                <button id="nav-plant" onclick="switchTab('plant')" class="px-3.5 py-1.5 rounded-lg hover:bg-emeraldBrand-700 text-emeraldBrand-100 transition whitespace-nowrap">🌱 Daily Nature Habit</button>
+                <button id="nav-gk" onclick="switchTab('gk')" class="px-3.5 py-1.5 rounded-lg hover:bg-emeraldBrand-700 text-emeraldBrand-100 transition whitespace-nowrap">📚 Knowledge & Concepts</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- TAB 1: DYNAMIC UHV QUIZ -->
+        <section id="tab-quiz" class="tab-content active space-y-6">
+            <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="border-b pb-4 mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Universal Human Values Assessment</h2>
+                        <p class="text-xs text-slate-500">5 random questions drawn per attempt from a pool of 15 UHV dilemmas.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="quiz-progress" class="text-xs font-bold text-emeraldBrand-700 bg-emeraldBrand-50 border border-emeraldBrand-200 px-3 py-1 rounded-full">Question 1 of 5</span>
+                        <button onclick="resetAndShuffleQuiz()" class="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded-full transition flex items-center gap-1">
+                            🔄 New Quiz
+                        </button>
+                    </div>
+                </div>
+
+                <div id="quiz-container" class="space-y-4">
+                    <p id="quiz-question" class="font-semibold text-slate-800 text-base leading-relaxed"></p>
+                    <div id="quiz-options" class="space-y-2.5"></div>
+                    
+                    <!-- Feedback & Improvement Suggestion Box -->
+                    <div id="quiz-feedback" class="hidden p-4 rounded-xl text-xs sm:text-sm space-y-2 border">
+                        <p id="feedback-mindset" class="font-medium"></p>
+                        <p id="feedback-suggestion" class="text-xs italic bg-white/60 p-2.5 rounded-lg border border-slate-200/60"></p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-between items-center">
+                    <span id="quiz-score-indicator" class="text-xs font-semibold text-slate-500">Session Score: 0/125</span>
+                    <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden bg-emeraldBrand-600 hover:bg-emeraldBrand-700 text-white font-medium px-5 py-2 rounded-xl text-xs sm:text-sm transition">
+                        Next Question →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: GAMIFIED SCENARIOS -->
+        <section id="tab-game" class="tab-content space-y-6">
+            <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+                <div class="border-b pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Interactive UHV Dilemma Simulator</h2>
+                        <p class="text-xs text-slate-500">3 randomly selected scenarios per round. Make value-guided decisions.</p>
+                    </div>
+                    <button onclick="resetAndShuffleScenarios()" class="text-xs font-semibold bg-emeraldBrand-50 hover:bg-emeraldBrand-100 text-emeraldBrand-800 px-3.5 py-1.5 rounded-full border border-emeraldBrand-200 transition flex items-center gap-1">
+                        🎲 Shuffle Scenarios
+                    </button>
+                </div>
+
+                <div id="scenario-card" class="bg-slate-900 text-white p-5 sm:p-6 rounded-2xl space-y-3 shadow-inner">
+                    <div class="flex items-center justify-between">
+                        <span id="scenario-number-badge" class="text-xs bg-emeraldBrand-600 text-white font-bold px-3 py-1 rounded-full">Scenario 1 of 3</span>
+                        <span class="text-xs text-amber-300 font-semibold">+20 pts for Harmony choice</span>
+                    </div>
+                    <h3 id="scenario-title" class="font-bold text-base sm:text-lg text-emeraldBrand-100"></h3>
+                    <p id="scenario-desc" class="text-xs sm:text-sm text-slate-300 leading-relaxed"></p>
+                </div>
+
+                <div id="scenario-choices" class="space-y-2.5"></div>
+                <div id="scenario-result" class="hidden p-4 rounded-xl text-xs sm:text-sm border"></div>
+
+                <div class="flex justify-end">
+                    <button id="scenario-next-btn" onclick="nextScenario()" class="hidden bg-emeraldBrand-600 hover:bg-emeraldBrand-700 text-white font-medium px-5 py-2 rounded-xl text-xs sm:text-sm transition">
+                        Next Scenario →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: DAILY NATURE & HARMONY HABITS -->
+        <section id="tab-plant" class="tab-content space-y-6">
+            <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                <div class="border-b pb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">Daily Eco & Harmony Habit Tracker</h2>
+                        <p class="text-xs text-slate-500">4 fresh random daily tasks loaded every session. Check them off to bloom your plant!</p>
+                    </div>
+                    <button onclick="reloadDailyTasks()" class="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-full transition">
+                        🔄 Refresh Tasks
+                    </button>
+                </div>
+
+                <!-- Plant Growth Display -->
+                <div class="bg-gradient-to-b from-sky-50 via-emerald-50/50 to-emerald-100/60 p-6 sm:p-8 rounded-2xl border border-emerald-200 text-center space-y-4 shadow-sm">
+                    <div class="text-7xl sm:text-8xl transform transition-transform duration-500 hover:scale-110 drop-shadow-md" id="plant-avatar">🌱</div>
+                    <div class="space-y-1">
+                        <h3 id="plant-stage-title" class="font-extrabold text-slate-800 text-lg">Stage 1: Tiny Seedling</h3>
+                        <p id="plant-stage-desc" class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">Complete your daily eco & human value tasks below to nurture your virtual plant!</p>
+                    </div>
+                    <!-- Growth Bar -->
+                    <div class="max-w-md mx-auto bg-slate-200/80 rounded-full h-3 overflow-hidden p-0.5 border border-emerald-200">
+                        <div id="plant-progress-bar" class="bg-emeraldBrand-500 h-full rounded-full transition-all duration-500" style="width: 15%"></div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Tasks Checklist -->
+                <div class="space-y-3">
+                    <h4 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+                        <span>Today's Random Harmony Actions</span>
+                        <span id="tasks-completed-badge" class="text-xs font-semibold text-emeraldBrand-700 bg-emeraldBrand-50 px-2.5 py-0.5 rounded-full">0/4 Done</span>
+                    </h4>
+                    <div class="space-y-2.5" id="tasks-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: EXPANDED UHV KNOWLEDGE & CONCEPT GUIDE -->
+        <section id="tab-gk" class="tab-content space-y-6">
+            <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                <div class="border-b pb-3">
+                    <h2 class="text-xl font-bold text-slate-900">UHV Core Concepts & Reference Guide</h2>
+                    <p class="text-xs text-slate-500">Comprehensive study material based on Universal Human Values (BSH23VE01) curriculum.</p>
+                </div>
+
+                <!-- Concept Accordion / Cards -->
+                <div class="space-y-4">
+                    
+                    <!-- 1. Four Levels of Living -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <div class="bg-slate-50 p-4 font-bold text-slate-800 text-sm flex items-center justify-between cursor-pointer" onclick="toggleAccordion('acc-1')">
+                            <span class="flex items-center gap-2">🌐 1. The 4 Levels of Living (Samagra Vyavastha)</span>
+                            <span id="acc-1-icon">▼</span>
+                        </div>
+                        <div id="acc-1" class="p-4 bg-white text-xs sm:text-sm space-y-2 text-slate-600">
+                            <p>Living in harmony requires understanding existence at four interdependent levels:</p>
+                            <ul class="list-disc list-inside space-y-1.5 pl-2 text-xs">
+                                <li><strong>1. Individual (Self & Body):</strong> Harmony between 'I' (Consciousness/Information) and 'Body' (Material tool).</li>
+                                <li><strong>2. Family (Parivar):</strong> Living in harmony with immediate relationships based on mutual trust and respect.</li>
+                                <li><strong>3. Society (Samaj):</strong> Extending harmony to extended community, work, and institutional structures.</li>
+                                <li><strong>4. Nature / Existence (Prakriti / Sah-astitva):</strong> Living in balance with soil, water, plants, animals, and cosmic order.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 2. Nine Feelings in Relationships -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <div class="bg-slate-50 p-4 font-bold text-slate-800 text-sm flex items-center justify-between cursor-pointer" onclick="toggleAccordion('acc-2')">
+                            <span class="flex items-center gap-2">🤝 2. Nine Foundational Feelings in Relationships</span>
+                            <span id="acc-2-icon">▼</span>
+                        </div>
+                        <div id="acc-2" class="p-4 bg-white text-xs sm:text-sm space-y-2 text-slate-600">
+                            <p>Relationships are not based on physical contracts but on internal values (*Bhāv*):</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 text-xs">
+                                <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                                    <strong class="text-amber-900 block">1. Trust (Vishwas)</strong>
+                                    Foundation of all relationship. Assurance that the other intends my happiness.
+                                </div>
+                                <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                                    <strong class="text-amber-900 block">2. Respect (Samman)</strong>
+                                    Right evaluation of the other person without differentiation or ego.
+                                </div>
+                                <div class="bg-amber-50 p-2.5 rounded-lg border border-amber-200">
+                                    <strong class="text-amber-900 block">3. Affection (Sneha)</strong>
+                                    Acceptance of the other person as one's relative or equal partner.
+                                </div>
+                                <div class="bg-sky-50 p-2.5 rounded-lg border border-sky-200">
+                                    <strong class="text-sky-900 block">4. Care (Mamata)</strong>
+                                    Responsibility & commitment to nurture and protect the physical body.
+                                </div>
+                                <div class="bg-sky-50 p-2.5 rounded-lg border border-sky-200">
+                                    <strong class="text-sky-900 block">5. Guidance (Vatsalya)</strong>
+                                    Responsibility & commitment to ensure Right Understanding in others.
+                                </div>
+                                <div class="bg-sky-50 p-2.5 rounded-lg border border-sky-200">
+                                    <strong class="text-sky-900 block">6. Gratitude (Krutagyata)</strong>
+                                    Feeling of acceptance for those who contributed to my growth.
+                                </div>
+                                <div class="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
+                                    <strong class="text-emerald-900 block">7. Glory (Gaurav)</strong>
+                                    Feeling of honour for those who made effort for excellence.
+                                </div>
+                                <div class="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
+                                    <strong class="text-emerald-900 block">8. Reverence (Shraddha)</strong>
+                                    Feeling of acceptance for those who have achieved Right Understanding.
+                                </div>
+                                <div class="bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
+                                    <strong class="text-emerald-900 block">9. Love (Prem)</strong>
+                                    Complete feeling of oneness with every single human being.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Four Orders of Nature -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <div class="bg-slate-50 p-4 font-bold text-slate-800 text-sm flex items-center justify-between cursor-pointer" onclick="toggleAccordion('acc-3')">
+                            <span class="flex items-center gap-2">🌳 3. The 4 Orders of Nature & Mutual Fulfillment</span>
+                            <span id="acc-3-icon">▼</span>
+                        </div>
+                        <div id="acc-3" class="p-4 bg-white text-xs sm:text-sm space-y-2 text-slate-600">
+                            <div class="space-y-2">
+                                <p><strong>1. Material Order (Padartha Avastha):</strong> Soil, water, air, metals. (Activity: Composition / Decomposition)</p>
+                                <p><strong>2. Bio / Plant Order (Prana Avastha):</strong> Plants, trees, greenery. (Activity: Respiration & Growth)</p>
+                                <p><strong>3. Animal Order (Jana Avastha):</strong> Animals & birds. (Activity: Selection & Desire to survive)</p>
+                                <p><strong>4. Human Order (Gyan Avastha):</strong> Humans. (Activity: Desire for Happiness, Right Understanding, Knowledge)</p>
+                            </div>
+                            <div class="p-3 bg-emerald-50 text-emerald-900 rounded-lg text-xs mt-2 border border-emerald-200">
+                                💡 <strong>Mutual Fulfillment (Paraspar Purnata):</strong> Orders 1, 2, and 3 naturally enrich each other. Humans currently exploit all three orders. Right understanding helps humans become mutually fulfilling to all orders.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Natural Acceptance vs Pre-conditioning -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <div class="bg-slate-50 p-4 font-bold text-slate-800 text-sm flex items-center justify-between cursor-pointer" onclick="toggleAccordion('acc-4')">
+                            <span class="flex items-center gap-2">⚖️ 4. Natural Acceptance (Sahaj Swvikriti) vs Pre-conditioning</span>
+                            <span id="acc-4-icon">▼</span>
+                        </div>
+                        <div id="acc-4" class="p-4 bg-white text-xs sm:text-sm space-y-2 text-slate-600">
+                            <p><strong>Natural Acceptance:</strong> The innate human capacity to know what is naturally acceptable without doubts, peer pressure, or external enforcement (e.g., wanting trust over mistrust, love over hatred).</p>
+                            <p><strong>Pre-conditioning (Manya):</strong> Unexamined beliefs absorbed from social media, peer culture, or media advertisements without self-verification.</p>
+                            <p><strong>Samyam (Self-Control) & Swasthya (Health):</strong> Feeling of responsibility toward the body to keep it nurtured, protected, and properly utilized.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t py-4 text-center text-xs text-slate-500 mt-auto">
+        <p>PCCoE Pune · Universal Human Values (BSH23VE01) · Interactive Seva Reflection App</p>
+    </footer>
+
+    <!-- Comprehensive JavaScript Engine -->
+    <script>
+        // GLOBAL APP STATE
+        let globalHarmonyScore = 0;
+        let activeTaskCount = 0;
+
+        function updateScore(pts) {
+            globalHarmonyScore += pts;
+            document.getElementById('harmony-score').innerText = globalHarmonyScore;
+        }
+
+        // TAB NAVIGATION ENGINE
+        function switchTab(tabName) {
+            const tabs = ['quiz', 'game', 'plant', 'gk'];
+            tabs.forEach(t => {
+                const el = document.getElementById('tab-' + t);
+                const nav = document.getElementById('nav-' + t);
+                if (t === tabName) {
+                    el.classList.add('active');
+                    nav.classList.add('bg-emeraldBrand-700', 'text-white', 'font-bold');
+                } else {
+                    el.classList.remove('active');
+                    nav.classList.remove('bg-emeraldBrand-700', 'text-white', 'font-bold');
+                }
+            });
+        }
+
+        function toggleAccordion(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(id + '-icon');
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.innerText = '▼';
+            } else {
+                el.classList.add('hidden');
+                icon.innerText = '▲';
+            }
+        }
+
+        // ==========================================
+        // 1. DYNAMIC QUIZ BANK (15+ UHV QUESTIONS)
+        // ==========================================
+        const fullQuizMasterBank = [
+            {
+                q: "Your peer gets higher lab marks due to a minor evaluation error by the teacher. What is your reaction?",
+                options: [
+                    { text: "Feel jealous and immediately report it to lower their score.", pts: 0, mindset: "Mindset: Driven by social comparison & envy.", suggestion: "Focus on your own inner learning (*Samyak Gyan*) rather than relative standing." },
+                    { text: "Congratulate them gracefully and focus on mastering your own concepts.", pts: 25, mindset: "Mindset: Right Understanding & Natural Acceptance.", suggestion: "Excellent! True self-worth comes from learning, not relative marks." },
+                    { text: "Mock them secretly among friends for getting unearned marks.", pts: 5, mindset: "Mindset: Lack of respect (*Samman*) and disrespect through criticism.", suggestion: "Practice evaluating people on their effort rather than temporary outcomes." }
+                ]
+            },
+            {
+                q: "A family member repeatedly gives you advice about your routine that feels frustrating. How do you respond?",
+                options: [
+                    { text: "Listen attentively, recognizing their underlying intention of Care (*Mamata*), even if delivery differs.", pts: 25, mindset: "Mindset: Harmony in Family & Distinction between Intention and Competence.", suggestion: "Outstanding! Intention is always for happiness; competence can vary." },
+                    { text: "Argue back aggressively to assert your independence.", pts: 0, mindset: "Mindset: Reaction based on ego and lack of patience.", suggestion: "Differentiate between intention (*Niyyat*) and competence (*Yogyata*)." },
+                    { text: "Nod silently while completely ignoring their words with resentment.", pts: 10, mindset: "Mindset: Surface compliance with hidden emotional disconnect.", suggestion: "Communicate respectfully (*Vishwas*) rather than holding suppressed resentment." }
+                ]
+            },
+            {
+                q: "How do you view physical facilities and modern electronics in your personal life?",
+                options: [
+                    { text: "As status symbols needed in unlimited quantities to show superiority.", pts: 0, mindset: "Mindset: Confusion between physical facility and happiness.", suggestion: "Physical goods satisfy body needs, not the 'I' (Self)'s need for continuous happiness." },
+                    { text: "As tools needed in limited quantity for body maintenance and smooth work.", pts: 25, mindset: "Mindset: Correct understanding of Prosperity (*Samridhi*).", suggestion: "Great clarity! Assessing physical needs accurately leads to genuine prosperity." },
+                    { text: "As necessary evils that cause environmental destruction.", pts: 10, mindset: "Mindset: Pessimism without holistic solution.", suggestion: "Use physical facilities responsibly and in eco-friendly co-existence (*Sah-astitva*)." }
+                ]
+            },
+            {
+                q: "When someone breaks your trust in a group project, what is your immediate underlying belief?",
+                options: [
+                    { text: "They are inherently evil and can never be trusted again.", pts: 0, mindset: "Mindset: Doubting basic human intention permanently.", suggestion: "Human intention is naturally good; their competence was lacking in this instance." },
+                    { text: "Their intention was fine, but their competence/capability fell short.", pts: 25, mindset: "Mindset: UHV Principle of Intention vs Competence.", suggestion: "Perfect insight! Help improve their competence instead of attacking intention." },
+                    { text: "Everyone in the college is unreliable, so I will work alone.", pts: 5, mindset: "Mindset: Isolation and fearlessness deficit (*Abhay* missing).", suggestion: "Build mutual trust (*Vishwas*) step-by-step through clear dialogue." }
+                ]
+            },
+            {
+                q: "What is the primary motive behind practicing Swasthya (Body Health) and Samyam (Self-Regulation)?",
+                options: [
+                    { text: "To keep the body fit so it can serve as an effective instrument for 'I' (Self).", pts: 25, mindset: "Mindset: Harmony between Self 'I' and Body.", suggestion: "Spot on! The body is a tool used by the self for meaningful living." },
+                    { text: "Only to post fitness pictures on social media for approval.", pts: 0, mindset: "Mindset: External pre-conditioning and social validation seeking.", suggestion: "Internal health is for self-sustenance, not external validation." },
+                    { text: "To avoid medical expenses and doctor visits.", pts: 15, mindset: "Mindset: Utilitarian view without deeper purpose.", suggestion: "Combine health maintenance with higher purpose in human conduct." }
+                ]
+            },
+            {
+                q: "During campus lunch, you notice significant food wastage on cafeteria tables. What is your perspective?",
+                options: [
+                    { text: "It is normal since people paid money for their food.", pts: 0, mindset: "Mindset: Money-centric worldview ignoring natural resources.", suggestion: "Money buys rights to food, but not the right to waste biological resources." },
+                    { text: "It violates mutual fulfillment with the Plant & Bio Order (*Prana Avastha*).", pts: 25, mindset: "Mindset: Harmony with Nature Order.", suggestion: "Excellent awareness! Food represents energy from the plant order." },
+                    { text: "Felt bad momentarily but did nothing about personal portion sizes.", pts: 10, mindset: "Mindset: Passive awareness without self-regulation.", suggestion: "Translate awareness into personal portion control (*Samyam*)." }
+                ]
+            },
+            {
+                q: "How do you handle intense exam stress or peer competition?",
+                options: [
+                    { text: "Remind myself of my natural acceptance and inherent values beyond exam marks.", pts: 25, mindset: "Mindset: Self-anchored in Natural Acceptance (*Sahaj Swvikriti*).", suggestion: "Brilliant! Marks evaluate skill, not your fundamental human worth." },
+                    { text: "Lose sleep and skip meals to outrank my classmates at any cost.", pts: 0, mindset: "Mindset: Disregard for Swasthya due to external pressure.", suggestion: "Never sacrifice body health (*Swasthya*) for short-term external comparisons." },
+                    { text: "Blame teachers and syllabus for causing unfair pressure.", pts: 5, mindset: "Mindset: Externalization of responsibility.", suggestion: "Focus on internal preparation and time management." }
+                ]
+            },
+            {
+                q: "When observing societal problems like corruption or pollution, how do you feel?",
+                options: [
+                    { text: "Helpless and angry at society.", pts: 5, mindset: "Mindset: Reaction without constructive purpose.", suggestion: "Channel anger into small personal value-based actions." },
+                    { text: "Motivated to start with my own right conduct and extend it to society.", pts: 25, mindset: "Mindset: Undivided Society (*Akhand Samaj*) orientation.", suggestion: "Wonderful! Universal order starts at the individual level." },
+                    { text: "Indifferent, as long as my personal career is unaffected.", pts: 0, mindset: "Mindset: Extreme individualism.", suggestion: "Human happiness is interconnected with societal order (*Samaj*)." }
+                ]
+            },
+            {
+                q: "What is your reaction when a classmate holds completely different political or cultural views?",
+                options: [
+                    { text: "Respect them as a human being ('I') while discussing ideas rationally.", pts: 25, mindset: "Mindset: Respect (*Samman*) without differentiation.", suggestion: "True respect evaluates human existence equally regardless of opinions." },
+                    { text: "Insult their background and stop speaking to them.", pts: 0, mindset: "Mindset: Differentiation based on beliefs.", suggestion: "Opinions vary; basic human value and capacity for understanding remains equal." },
+                    { text: "Tolerate them outwardly while judging them internally.", pts: 10, mindset: "Mindset: Conditional tolerance without true respect.", suggestion: "Work toward genuine understanding through dialogue." }
+                ]
+            },
+            {
+                q: "Your old laptop is lagging. How do you decide whether to replace it?",
+                options: [
+                    { text: "Buy the latest flagship immediately because friends have it.", pts: 0, mindset: "Mindset: Pre-conditioning by peer culture.", suggestion: "Evaluate if new device genuinely fulfills a functional physical need." },
+                    { text: "Assess if performance can be upgraded or optimized before buying new e-waste.", pts: 25, mindset: "Mindset: Prosperity & Eco-responsibility.", suggestion: "Awesome! Minimizing unnecessary e-waste protects the Material Order." },
+                    { text: "Keep using it while constantly complaining about it.", pts: 10, mindset: "Mindset: Dissatisfaction without practical solution.", suggestion: "Make a conscious, rational choice based on actual need." }
+                ]
+            },
+            {
+                q: "What does 'Natural Acceptance' (Sahaj Swvikriti) mean to you in daily decisions?",
+                options: [
+                    { text: "Doing whatever gives temporary sensory pleasure.", pts: 0, mindset: "Mindset: Confusion between sensory indulgence and natural acceptance.", suggestion: "Sensory pleasure is temporary; natural acceptance leads to lasting harmony." },
+                    { text: "An uncorrupted inner voice that naturally desires trust, respect, and peace.", pts: 25, mindset: "Mindset: Clear understanding of Sahaj Swvikriti.", suggestion: "Perfect! Listening to natural acceptance leads to self-verification." },
+                    { text: "Following whatever rules society enforces strictly.", pts: 10, mindset: "Mindset: Reliance on external enforcement rather than internal self-verification.", suggestion: "Internalize values so conduct comes naturally without external force." }
+                ]
+            },
+            {
+                q: "A junior student asks for guidance late in the evening when you are busy.",
+                options: [
+                    { text: "Politely schedule a dedicated time next day to guide them properly (*Vatsalya*).", pts: 25, mindset: "Mindset: Guidance (*Vatsalya*) combined with self-management.", suggestion: "Great balanced approach! You show responsibility without chaotic schedule." },
+                    { text: "Scold them for bothering you and block their number.", pts: 0, mindset: "Mindset: Absence of affection (*Sneha*) and care.", suggestion: "Remember that juniors look up to seniors for support in academic culture." },
+                    { text: "Give wrong quick advice just to get rid of them.", pts: 0, mindset: "Mindset: Lack of responsibility in relationship.", suggestion: "Honesty and care build enduring institutional trust." }
+                ]
+            },
+            {
+                q: "When taking part in college festivals, what is your primary goal?",
+                options: [
+                    { text: "To collaborate, build relationships, and contribute to collective joy.", pts: 25, mindset: "Mindset: Harmony in Society & Gratitude.", suggestion: "Excellent! Festivities are opportunities for mutual fulfillment." },
+                    { text: "To show off personal dominance and outshine everyone.", pts: 0, mindset: "Mindset: Ego-driven competition.", suggestion: "Cooperation yields far greater joy than dominating peers." },
+                    { text: "Just to get attendance certificates.", pts: 5, mindset: "Mindset: Transactional mindset.", suggestion: "Engage deeply to experience social harmony." }
+                ]
+            },
+            {
+                q: "How do you view your relationship with stray animals on campus or in your neighborhood?",
+                options: [
+                    { text: "Co-existence (*Sah-astitva*) with the Animal Order (*Jana Avastha*) without harm.", pts: 25, mindset: "Mindset: Harmony with Animal Order.", suggestion: "Compassion toward animals completes our fulfillment with nature." },
+                    { text: "Nuisance that should be removed by any means.", pts: 0, mindset: "Mindset: Exploitative view of nature orders.", suggestion: "Animals have a desire to survive; humans must co-exist peacefully." },
+                    { text: "Indifferent unless they obstruct my path.", pts: 10, mindset: "Mindset: Passive stance toward nature harmony.", suggestion: "Acknowledge the role of animal order in eco-balance." }
+                ]
+            },
+            {
+                q: "What is your approach to personal mistakes or failures in life?",
+                options: [
+                    { text: "Self-verify, learn the lesson, and improve competence (*Yogyata*).", pts: 25, mindset: "Mindset: Self-exploration & Continuous improvement.", suggestion: "Fantastic! Failure is simply a gap in competence, not in your core self." },
+                    { text: "Fallback into severe self-hatred and depression.", pts: 5, mindset: "Mindset: Lack of self-understanding ('I' vs Body/Events).", suggestion: "You are the observer ('I'); mistakes are opportunities to gain right understanding." },
+                    { text: "Blame friends or luck entirely.", pts: 0, mindset: "Mindset: Shifting responsibility externally.", suggestion: "Own your growth journey through self-investigation (*Svatantrata*)." }
+                ]
+            }
+        ];
+
+        let currentActiveQuiz = [];
+        let quizIndex = 0;
+        let quizSessionScore = 0;
+
+        function shuffleArray(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
+        }
+
+        function resetAndShuffleQuiz() {
+            currentActiveQuiz = shuffleArray(fullQuizMasterBank).slice(0, 5);
+            quizIndex = 0;
+            quizSessionScore = 0;
+            document.getElementById('quiz-score-indicator').innerText = `Session Score: 0/125`;
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            const current = currentActiveQuiz[quizIndex];
+            document.getElementById('quiz-progress').innerText = `Question ${quizIndex + 1} of 5`;
+            document.getElementById('quiz-question').innerText = current.q;
+            document.getElementById('quiz-feedback').classList.add('hidden');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+
+            const container = document.getElementById('quiz-options');
+            container.innerHTML = '';
+
+            current.options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-emeraldBrand-500 hover:bg-emeraldBrand-50/60 text-xs sm:text-sm font-medium transition shadow-sm bg-white";
+                btn.innerText = opt.text;
+                btn.onclick = () => selectQuizOption(opt, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectQuizOption(opt, btn) {
+            // Disable all option buttons
+            const buttons = document.getElementById('quiz-options').querySelectorAll('button');
+            buttons.forEach(b => b.disabled = true);
+
+            const feedback = document.getElementById('quiz-feedback');
+            const mindsetEl = document.getElementById('feedback-mindset');
+            const sugEl = document.getElementById('feedback-suggestion');
+
+            feedback.classList.remove('hidden');
+            mindsetEl.innerText = opt.mindset;
+            sugEl.innerText = "💡 Suggestion: " + opt.suggestion;
+
+            if (opt.pts > 0) {
+                feedback.className = "p-4 rounded-xl text-xs sm:text-sm bg-emerald-50 text-emerald-900 border border-emerald-200";
+            } else {
+                feedback.className = "p-4 rounded-xl text-xs sm:text-sm bg-amber-50 text-amber-900 border border-amber-200";
+            }
+
+            quizSessionScore += opt.pts;
+            updateScore(opt.pts);
+            document.getElementById('quiz-score-indicator').innerText = `Session Score: ${quizSessionScore}/125`;
+
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            if (quizIndex < currentActiveQuiz.length - 1) {
+                quizIndex++;
+                loadQuizQuestion();
+            } else {
+                alert(`Quiz Complete! You earned ${quizSessionScore} Harmony Points in this session.`);
+                resetAndShuffleQuiz();
+            }
+        }
+
+
+        // ==========================================
+        // 2. GAMIFIED SCENARIO SIMULATOR (8+ SCENARIOS)
+        // ==========================================
+        const scenarioMasterBank = [
+            {
+                title: "Campus Library Noise Conflict",
+                desc: "A group of juniors is loudly discussing a project in the quiet study zone. You have an exam in 1 hour.",
+                choices: [
+                    { text: "Walk over calmly, express your need for quietness with respect (*Samman*), and suggest the group discussion area.", correct: true, pts: 20, exp: "Excellent! You resolved conflict through mutual respect without anger or public embarrassment." },
+                    { text: "Shout at them loudly in front of everyone to teach them library rules.", correct: false, pts: 0, exp: "Shouting creates reaction and disrespect. Harmony requires polite dialogue." }
+                ]
+            },
+            {
+                title: "Hostel Roommate Messiness",
+                desc: "Your roommate consistently leaves wet towels and discarded paper on your desk.",
+                choices: [
+                    { text: "Initiate an open conversation assuming good intention (*Vishwas*), setting up shared housekeeping responsibilities.", correct: true, pts: 20, exp: "Spot on! Dialogue builds long-term relationship trust." },
+                    { text: "Throw their belongings outside the room in retaliation.", correct: false, pts: 0, exp: "Retaliation escalates hostility and destroys domestic harmony." }
+                ]
+            },
+            {
+                title: "Social Media Rumor Spreading",
+                desc: "A viral WhatsApp message in your class group mocks a classmate's personal background.",
+                choices: [
+                    { text: "Refuse to forward it, message the sender privately about respect (*Samman*), and support the peer.", correct: true, pts: 20, exp: "Heroic conduct! Stopping gossip upholds human dignity." },
+                    { text: "Forward it with laughing emojis to fit in with peer group pressure.", correct: false, pts: 0, exp: "Yielding to peer pressure damages natural acceptance." }
+                ]
+            },
+            {
+                title: "Unused Charger Power Drain",
+                desc: "You notice multiple laptop chargers plugged into empty sockets in the college computer lab.",
+                choices: [
+                    { text: "Unplug them carefully to save energy and protect the Material Order (*Padartha Avastha*).", correct: true, pts: 20, exp: "Awesome ecological responsibility! Small acts conserve global energy." },
+                    { text: "Ignore it because college pays the electricity bill.", correct: false, pts: 0, exp: "Natural resources belong to existence, not just financial entities." }
+                ]
+            },
+            {
+                title: "Proxy Attendance Request",
+                desc: "Your best friend asks you to mark fake attendance (proxy) for a lecture they skipped for fun.",
+                choices: [
+                    { text: "Politely decline, explaining that honesty and authentic evaluation matter, while offering to share lecture notes.", correct: true, pts: 20, exp: "True friendship supports right conduct rather than enabling dishonesty." },
+                    { text: "Mark proxy without hesitation to prove loyalty.", correct: false, pts: 0, exp: "Dishonesty undermines institutional trust and internal integrity." }
+                ]
+            },
+            {
+                title: "Cafeteria Cleaning Staff Respect",
+                desc: "A cleaning worker accidentally spills water near your shoes while mopping the canteen floor.",
+                choices: [
+                    { text: "Assure them kindly that it's fine and thank them for keeping campus clean.", correct: true, pts: 20, exp: "Wonderful! Recognizing equality of human existence regardless of job role." },
+                    { text: "Berate them publicly for negligence.", correct: false, pts: 0, exp: "Ego-driven differentiation breaches fundamental human respect." }
+                ]
+            },
+            {
+                title: "E-Waste Disposal Decision",
+                desc: "You have old broken headphones and dead batteries lying in your drawer.",
+                choices: [
+                    { text: "Dispose of them in dedicated campus e-waste bins for recycling.", correct: true, pts: 20, exp: "Great practice of mutual fulfillment (*Paraspar Purnata*) with nature!" },
+                    { text: "Toss them into normal wet/dry dustbins.", correct: false, pts: 0, exp: "Toxic heavy metals harm soil and groundwater." }
+                ]
+            },
+            {
+                title: "Overcoming Group Work Free-Rider",
+                desc: "One team member in your UHV presentation team isn't contributing due to personal family troubles.",
+                choices: [
+                    { text: "Show Care (*Mamata*), understand their genuine constraint, re-assign manageable parts, and help them catch up.", correct: true, pts: 20, exp: "Compassionate leadership! Supporting peers during distress builds lifelong bond." },
+                    { text: "Remove their name from final slides immediately without asking.", correct: false, pts: 0, exp: "Lack of empathy breaks team relationship." }
+                ]
+            }
+        ];
+
+        let activeScenarios = [];
+        let scenarioIndex = 0;
+
+        function resetAndShuffleScenarios() {
+            activeScenarios = shuffleArray(scenarioMasterBank).slice(0, 3);
+            scenarioIndex = 0;
+            loadScenario();
+        }
+
+        function loadScenario() {
+            const current = activeScenarios[scenarioIndex];
+            document.getElementById('scenario-number-badge').innerText = `Scenario ${scenarioIndex + 1} of 3`;
+            document.getElementById('scenario-title').innerText = current.title;
+            document.getElementById('scenario-desc').innerText = current.desc;
+
+            const choicesContainer = document.getElementById('scenario-choices');
+            choicesContainer.innerHTML = '';
+
+            const res = document.getElementById('scenario-result');
+            res.classList.add('hidden');
+            document.getElementById('scenario-next-btn').classList.add('hidden');
+
+            current.choices.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs sm:text-sm transition font-medium bg-white";
+                btn.innerText = opt.text;
+                btn.onclick = () => {
+                    // Disable choices
+                    choicesContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+                    res.classList.remove('hidden');
+                    res.innerText = opt.exp;
+                    if(opt.correct) {
+                        res.className = "p-4 rounded-xl text-xs sm:text-sm bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium";
+                        updateScore(opt.pts);
+                    } else {
+                        res.className = "p-4 rounded-xl text-xs sm:text-sm bg-rose-50 text-rose-800 border border-rose-200 font-medium";
+                    }
+                    document.getElementById('scenario-next-btn').classList.remove('hidden');
+                };
+                choicesContainer.appendChild(btn);
+            });
+        }
+
+        function nextScenario() {
+            if (scenarioIndex < activeScenarios.length - 1) {
+                scenarioIndex++;
+                loadScenario();
+            } else {
+                alert("Scenario Round Complete! Shuffling new scenarios for you.");
+                resetAndShuffleScenarios();
+            }
+        }
+
+
+        // ==========================================
+        // 3. DYNAMIC DAILY NATURE HABIT ENGINE (12+ POOL)
+        // ==========================================
+        const dailyTaskMasterPool = [
+            "Unplugged laptop/phone charger immediately after full charge.",
+            "Expressed sincere verbal gratitude to a family member or college staff member today.",
+            "Turned off tap completely while brushing/washing to prevent water waste.",
+            "Practiced 5 minutes of quiet self-reflection without phone screens.",
+            "Used both sides of paper or digital notes for college work.",
+            "Avoided anger during a disagreement; listened patiently (*Samyam*).",
+            "Disposed of plastic wrappers into proper recycling bins.",
+            "Genuinely praised a peer for their hard work or project contribution.",
+            "Carried a reusable water bottle instead of buying single-use plastic bottles.",
+            "Cleared your food tray completely without wasting edible food.",
+            "Took a 10-minute walk observing campus trees/birds with mindfulness.",
+            "Helped a friend understand a complex engineering concept patiently."
+        ];
+
+        let currentDailyTasks = [];
+
+        function reloadDailyTasks() {
+            currentDailyTasks = shuffleArray(dailyTaskMasterPool).slice(0, 4);
+            activeTaskCount = 0;
+            updatePlantStage();
+
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = '';
+
+            currentDailyTasks.forEach((taskText) => {
+                const label = document.createElement('label');
+                label.className = "flex items-center space-x-3 p-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer text-xs sm:text-sm bg-white transition shadow-sm";
+                label.innerHTML = `
+                    <input type="checkbox" onchange="toggleTask(this, 15)" class="w-4 h-4 text-emeraldBrand-600 rounded focus:ring-emeraldBrand-500 border-slate-300">
+                    <span class="text-slate-700">${taskText}</span>
+                `;
+                container.appendChild(label);
+            });
+
+            document.getElementById('tasks-completed-badge').innerText = `0/4 Done`;
+        }
+
+        function toggleTask(checkbox, pts) {
+            if(checkbox.checked) {
+                activeTaskCount++;
+                updateScore(pts);
+            } else {
+                activeTaskCount = Math.max(0, activeTaskCount - 1);
+                updateScore(-pts);
+            }
+            document.getElementById('tasks-completed-badge').innerText = `${activeTaskCount}/4 Done`;
+            updatePlantStage();
+        }
+
+        function updatePlantStage() {
+            const avatar = document.getElementById('plant-avatar');
+            const title = document.getElementById('plant-stage-title');
+            const desc = document.getElementById('plant-stage-desc');
+            const bar = document.getElementById('plant-progress-bar');
+
+            if(activeTaskCount === 0) {
+                avatar.innerText = "🌱";
+                title.innerText = "Stage 1: Tiny Seedling";
+                desc.innerText = "Check off your daily UHV actions below to nurture your plant!";
+                bar.style.width = "15%";
+            } else if(activeTaskCount === 1) {
+                avatar.innerText = "🌿";
+                title.innerText = "Stage 2: Sprouting Plant";
+                desc.innerText = "Your daily eco & value actions are giving life to your plant!";
+                bar.style.width = "40%";
+            } else if(activeTaskCount === 2 || activeTaskCount === 3) {
+                avatar.innerText = "🌳";
+                title.innerText = "Stage 3: Flourishing Tree";
+                desc.innerText = "Fantastic! Strong habits of trust and nature care make your tree grow tall!";
+                bar.style.width = "75%";
+            } else if(activeTaskCount === 4) {
+                avatar.innerText = "🌸";
+                title.innerText = "Stage 4: Blooming Harmony Flower!";
+                desc.innerText = "Splendid! All daily actions completed. You are living in harmony with Self, Family, Society, and Nature!";
+                bar.style.width = "100%";
+            }
+        }
+
+        // INITIALIZE APP ON LOAD
+        window.onload = function() {
+            resetAndShuffleQuiz();
+            resetAndShuffleScenarios();
+            reloadDailyTasks();
+        };
+    </script>
+</body>
+</html>
